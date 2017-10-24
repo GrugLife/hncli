@@ -1,9 +1,34 @@
+# /usr/bin/Python3
+
 import requests
 import json
 import sys
 import argparse
+from collections import OrderedDict
+
 
 # run this in the command line to set the encoding to UTF-8: 'chcp 65001'
+
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+    def disable(self):
+        self.HEADER = ''
+        self.OKBLUE = ''
+        self.OKGREEN = ''
+        self.WARNING = ''
+        self.FAIL = ''
+        self.ENDC = ''
+        self.BOLD = ''
+        self.UNDERLINE = ''
 
 
 def getTopStoriesIDs(n=500):
@@ -37,7 +62,8 @@ def getBestStoriesIDs(n=500):
 
 
 def getStories(ids):
-    stories = {}
+    stories = OrderedDict()
+    i = 1
 
     for n in ids:
         url = 'https://hacker-news.firebaseio.com/v0/item/' + str(n) + '.json?print=pretty'
@@ -49,11 +75,14 @@ def getStories(ids):
         try:
             stories[display['title']] = display['url']
         except:
-            stories[display['title']] = n
+            stories[display['title']] = ''
 
     for key, values in stories.items():
-        print(key, values)
+        key = key.encode('utf-8')
+        print(i,  key)
+        print(bcolors.OKBLUE + values + bcolors.ENDC + '\n')
 
+        i += 1
 
 def maxItemId():
     url = ' https://hacker-news.firebaseio.com/v0/maxitem.json?print=pretty'
@@ -88,13 +117,13 @@ def main():
             getStories(getBestStoriesIDs(int(namespace.results)))
         if namespace.new:
             getStories(getNewStoriesIDs(int(namespace.results)))
-
-    if namespace.top:
-        getStories(getTopStoriesIDs())
-    if namespace.best:
-        getStories(getBestStoriesIDs())
-    if namespace.new:
-        getStories(getNewStoriesIDs())
+    else:
+        if namespace.top:
+            getStories(getTopStoriesIDs())
+        if namespace.best:
+            getStories(getBestStoriesIDs())
+        if namespace.new:
+            getStories(getNewStoriesIDs())
 
 
 if __name__ == '__main__':
