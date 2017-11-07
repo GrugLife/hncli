@@ -31,35 +31,16 @@ class bcolors:
         self.UNDERLINE = ''
 
 
-def getTopStoriesIDs(n=500):
-    url = 'https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty'
+def getStoryIDs(story, n=500):
+	#""" returns the ids of the stories to be passed to a later function.  User chooses between top, best, or new stoies """
+    url = 'https://hacker-news.firebaseio.com/v0/'+ story + 'stories.json?print=pretty'
     r = requests.get(url)
     r.raise_for_status()
 
     topStories = json.loads(r.text)
 
     return topStories[0:n]
-
-
-def getNewStoriesIDs(n=500):
-    url = 'https://hacker-news.firebaseio.com/v0/newstories.json?print=pretty'
-    r = requests.get(url)
-    r.raise_for_status()
-
-    newStories = json.loads(r.text)
-
-    return newStories[0:n]
-
-
-def getBestStoriesIDs(n=500):
-    url = 'https://hacker-news.firebaseio.com/v0/beststories.json?print=pretty'
-    r = requests.get(url)
-    r.raise_for_status()
-
-    bestStories = json.loads(r.text)
-
-    return bestStories[0:n]
-
+		
 
 def getStories(ids):
     stories = OrderedDict()
@@ -78,9 +59,9 @@ def getStories(ids):
             stories[display['title']] = ''
 
     for key, values in stories.items():
-        key = key.encode('utf-8')
-        print(i,  key)
-        print(bcolors.OKBLUE + values + bcolors.ENDC + '\n')
+
+        print(bcolors.BOLD + str(i) + '. ' + str(key) + bcolors.ENDC)
+        print(bcolors.UNDERLINE + bcolors.OKBLUE + values + bcolors.ENDC + '\n')
 
         i += 1
 
@@ -112,18 +93,18 @@ def main():
     namespace = parseArguments(sys.argv[1:])
     if namespace.results:
         if namespace.top:
-            getStories(getTopStoriesIDs(int(namespace.results)))
+            getStories(getStoryIDs("top", int(namespace.results)))
         if namespace.best:
-            getStories(getBestStoriesIDs(int(namespace.results)))
+            getStories(getStoryIDs("best", int(namespace.results)))
         if namespace.new:
-            getStories(getNewStoriesIDs(int(namespace.results)))
+            getStories(getStoryIDs("new", int(namespace.results)))
     else:
         if namespace.top:
-            getStories(getTopStoriesIDs())
+            getStories(getStoryIDs("top"))
         if namespace.best:
-            getStories(getBestStoriesIDs())
+            getStories(getStoryIDs("best"))
         if namespace.new:
-            getStories(getNewStoriesIDs())
+            getStories(getStoryIDs("new"))
 
 
 if __name__ == '__main__':
